@@ -50,6 +50,7 @@ public class Lexer {
             Word w = (Word) words.get(s);
             if (w != null) return w;
             w = new Word(Tag.ID, s);
+            
             words.put(s, w);
             
             return w;
