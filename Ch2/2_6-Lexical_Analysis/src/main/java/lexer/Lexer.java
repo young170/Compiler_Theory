@@ -20,7 +20,7 @@ public class Lexer {
 
     public Token scan() throws IOException {
         for ( ; ; peek = (char) System.in.read()) {
-            if (peek == ' ' || peek == '\n') {
+            if (peek == ' ' || peek == '\t') {
                 continue;
             } else if (peek == '\n') {
                 line++;
