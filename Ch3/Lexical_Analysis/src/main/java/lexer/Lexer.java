@@ -9,12 +9,10 @@ public class Lexer {
 
     private char[][] buffers;
     private int lineCount;
+    private Hashtable<String, Token> symbolTable = new Hashtable<String, Token>();
 
-    // temporary symbol table
-    private Hashtable<String, Token> words = new Hashtable<String, Token>();
-
-    void reserve(Word w) {
-        words.put(w.lexeme, w);
+    private void reserve(Word w) {
+        symbolTable.put(w.lexeme, w);
     }
 
     public Lexer() {
@@ -72,17 +70,35 @@ public class Lexer {
         return buffers;
     }
 
+    public static boolean isPartOfPattern(String pattern, char ch) {
+        return pattern.indexOf(ch) != -1;
+    }
+
     public void iterateBuffer(Lexer lexer, char[] buffer) {
         int ptr = 0;
         ReaderFactory lexReader = null;
+        String operators = "+-*/%=!^&|<>";
 
-        if (Character.isDigit(buffer[ptr])) {
-            lexReader = new NumReaderFactory();
-        } else if (Character.isAlphabetic(buffer[ptr])) {
-            lexReader = new IdReaderFactory();
+        while (ptr < buffer.length && buffer[ptr] != '\0') {
+            if (Character.isDigit(buffer[ptr])) {
+                lexReader = new NumReaderFactory();
+            } else if (Character.isAlphabetic(buffer[ptr])) {
+                lexReader = new IdReaderFactory();
+            } else if (isPartOfPattern(operators, buffer[ptr])) {
+                lexReader = new OpReaderFactory();
+            }
+
+            // Process token
+            if (lexReader != null) {
+                Token token = lexReader.reader(buffer, ptr);
+                lexer.symbolTable.put(token.toString(), token);
+                ptr += token.toString().length();
+            } else {
+                ptr++;
+            }
+
+            lexReader = null;
         }
-
-        lexReader.reader(buffer, ptr);
     }
 
 }
