@@ -1,9 +1,9 @@
 package main.java.lexer;
 
 import main.java.lexer.types.*;
+import main.java.lexer.readers.*;
 import java.io.*;
 import java.util.Hashtable;
-import java.util.regex.Pattern;
 
 public class Lexer {
 
@@ -72,66 +72,17 @@ public class Lexer {
         return buffers;
     }
 
-    private static int matchNumPattern(Lexer lexer, Pattern pattern, char targetChar, char[] buffer, int ptr) {
-        if (pattern.matcher(String.valueOf(targetChar)).matches()) {
-            int v = 0;
-
-            do {
-                v = 10 * v + Character.digit(targetChar, 10);
-                targetChar = buffer[ptr++];
-            } while (Character.isDigit(targetChar));
-
-            Num num = new Num(v);
-            lexer.words.put(Integer.toString(v), num);
-        }
-        
-        return ptr;
-    }
-
-    private static int matchAlphaPattern(Lexer lexer, Pattern pattern, char targetChar, char[] buffer, int ptr) {
-        if (pattern.matcher(String.valueOf(targetChar)).matches()) {
-            StringBuffer b = new StringBuffer();
-
-            do {
-                b.append(targetChar);
-                targetChar = buffer[ptr++];
-            } while (Character.isLetter(targetChar));
-
-            String s = b.toString();
-
-            Word w = (Word) lexer.words.get(s);
-            if (w == null) { // entry already in symbol table
-                w = new Word(Tag.ID, s);
-                lexer.words.put(s, w);
-            }
-        }
-
-        return ptr;
-    }
-
     public void iterateBuffer(Lexer lexer, char[] buffer) {
-        Pattern alphaPattern = Pattern.compile("[a-zA-Z]+");
-        Pattern numPattern = Pattern.compile("[0-9]+");
+        int ptr = 0;
+        ReaderFactory lexReader = null;
 
-        int lexmeBegin = 0; // Starting pointer of current token in buffer
-        int forward = 0; // Ending pointer of current token in buffer
-        while (lexmeBegin < buffer.length) {
-            char currentChar = buffer[forward++];
-
-            if (currentChar == ' ' || currentChar == '\t') {
-                if (lexmeBegin != forward) { // end of token
-                    lexmeBegin = forward;
-                }
-
-                continue;
-            } else if (currentChar == '\n') {
-                lexer.lineCount++;
-                continue;
-            }
-
-            matchNumPattern(lexer, numPattern, currentChar, buffer, currentChar);
-            matchAlphaPattern(lexer, alphaPattern, currentChar, buffer, currentChar);
+        if (Character.isDigit(buffer[ptr])) {
+            lexReader = new NumReaderFactory();
+        } else if (Character.isAlphabetic(buffer[ptr])) {
+            lexReader = new IdReaderFactory();
         }
+
+        lexReader.reader(buffer, ptr);
     }
 
 }
