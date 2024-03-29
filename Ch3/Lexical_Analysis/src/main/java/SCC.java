@@ -10,9 +10,9 @@ import main.java.lexer.types.Token;
 import main.java.parser.*;
 
 /**
- * SCB: SB C Builder
+ * SCC: SB C Compiler
  */
-public class SCB {
+public class SCC {
 
     private static Hashtable<String, Token> symbolTable;
     
@@ -31,6 +31,7 @@ public class SCB {
         }
 
         Lexer lexer = new Lexer();
+        
         try {
             lexer.scanTokens(fileInputStream);
         } catch (IOException e) {

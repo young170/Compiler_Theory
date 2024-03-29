@@ -80,7 +80,7 @@ public class Lexer {
         return null;
     }
 
-    private static boolean isPartOfPattern(String pattern, char ch) {
+    public static boolean isPartOfPattern(String pattern, char ch) {
         return pattern.indexOf(ch) != -1;
     }
 
