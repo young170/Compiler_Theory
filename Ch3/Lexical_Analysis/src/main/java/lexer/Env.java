@@ -29,4 +29,6 @@ public class Env {
         return null;
     }
 
+    public Hashtable<String, Token> getTable() { return table; }
+
 }

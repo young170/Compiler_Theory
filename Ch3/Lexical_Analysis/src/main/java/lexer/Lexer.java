@@ -9,20 +9,22 @@ public class Lexer {
 
     private char[][] buffers;
     private int lineCount;
-    private Hashtable<String, Token> symbolTable = new Hashtable<String, Token>();
+    private Env env;
 
     private static final String digit_pattern = "\\d";
     private static final String alphabet_pattern = "[a-zA-Z]";
     private static final String operator_pattern = "[\\+\\-\\*/%=!^&|<>]";
 
     private void reserve(Word w) {
-        symbolTable.put(w.lexeme, w);
+        env.getTable().put(w.lexeme, w);
     }
 
     public Lexer() {
         // insert constants to symbol table at initialization
         reserve(new Word(Tag.TRUE, "true"));
         reserve(new Word(Tag.FALSE, "false"));
+
+        env = new Env(null); // init new symbol table tree, environment
     }
 
     public void scanTokens(FileInputStream inputStream) throws IOException {
@@ -55,7 +57,7 @@ public class Lexer {
                     Token token = lexReader.reader(buffer, ptr);
 
                     if (token != null) {
-                        symbolTable.put(token.toString(), token);
+                        env.getTable().put(token.toString(), token);
                         ptr += token.toString().length() - 1; // Skip processed characters
                     }
                 }
@@ -82,7 +84,7 @@ public class Lexer {
         return pattern.indexOf(ch) != -1;
     }
 
-    public Hashtable<String, Token> getSymbolTable()    { return symbolTable; }
+    public Hashtable<String, Token> getSymbolTable()    { return env.getTable(); }
     public int getLineCount()                           { return lineCount; }
 
 }
