@@ -11,6 +11,10 @@ public class Lexer {
     private int lineCount;
     private Hashtable<String, Token> symbolTable = new Hashtable<String, Token>();
 
+    private static final String digit_pattern = "\\d";
+    private static final String alphabet_pattern = "[a-zA-Z]";
+    private static final String operator_pattern = "[\\+\\-\\*/%=!^&|<>]";
+
     private void reserve(Word w) {
         symbolTable.put(w.lexeme, w);
     }
@@ -21,84 +25,64 @@ public class Lexer {
         reserve(new Word(Tag.FALSE, "false"));
     }
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java Lexer <filepath>");
-            System.exit(1);
-        }
-
-        String filePath = args[0];
-        Lexer lexer = new Lexer();
-
-        // load file data into both buffer pairs
-        try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            lexer.buffers = lexer.loadFileIntoBuffers(fileInputStream);
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found: " + filePath);
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-        }
-
-        // TODO
-        // iterate over buffers using lexmeBegin and forward based on FSM
-        /*
-         * while (forward_ptr has not reached an eof marker) {
-         *      lexer.iterateBuffer(lexer, lexer.buffers);
-         *      *** which would iterate using both buffers as buffer pair
-         * }
-         */
-        lexer.iterateBuffer(lexer, lexer.buffers[0]);
-        lexer.iterateBuffer(lexer, lexer.buffers[1]);
-    }
-
-    public char[][] loadFileIntoBuffers(InputStream inputStream) throws IOException {
-        char[][] buffers = new char[2][4096];
+    public void scanTokens(FileInputStream inputStream) throws IOException {
         InputStreamReader reader = new InputStreamReader(inputStream);
-        
-        int bytesRead1 = reader.read(buffers[0], 0, 4096);
-        int bytesRead2 = reader.read(buffers[1], 0, 4096);
 
-        // TODO
-        // if bytesRead<1,2> is less than 4096, then mark eof
-        if (bytesRead1 < buffers[0].length) {
-            buffers[0][bytesRead1] = '\0';
-        } else if (bytesRead2 < buffers[1].length) {
-            buffers[0][bytesRead2] = '\0';
+        buffers = new char[2][4096];
+        int currentBufferIndex = 0;
+        ReaderFactory lexReader = null;
+
+        while (true) {
+            // Read data into the current buffer
+            int bytesRead = reader.read(buffers[currentBufferIndex]);
+            if (bytesRead == -1) {
+                break; // EOF
+            }
+            
+            // Iterate through the buffer
+            for (int ptr = 0; ptr < bytesRead; ptr++) {
+                char[] buffer = buffers[currentBufferIndex];
+                char currentChar = buffer[ptr];
+
+                if (currentChar == '\n') {
+                    lineCount++;
+                }
+
+                lexReader = streamSpellChecker(currentChar);
+                
+                // Process the token
+                if (lexReader != null) {
+                    Token token = lexReader.reader(buffer, ptr);
+
+                    if (token != null) {
+                        symbolTable.put(token.toString(), token);
+                        ptr += token.toString().length() - 1; // Skip processed characters
+                    }
+                }
+            }
+            
+            // Switch to the next buffer
+            currentBufferIndex = (currentBufferIndex + 1) % 2;
         }
-
-        return buffers;
     }
 
-    public static boolean isPartOfPattern(String pattern, char ch) {
+    private static ReaderFactory streamSpellChecker(char c) {
+        if (isPartOfPattern(digit_pattern, c)) {
+            return new NumReaderFactory();
+        } else if (isPartOfPattern(alphabet_pattern, c)) {
+            return new IdReaderFactory();
+        } else if (isPartOfPattern(operator_pattern, c)) {
+            return new OpReaderFactory();
+        }
+        
+        return null;
+    }
+
+    private static boolean isPartOfPattern(String pattern, char ch) {
         return pattern.indexOf(ch) != -1;
     }
 
-    public void iterateBuffer(Lexer lexer, char[] buffer) {
-        int ptr = 0;
-        ReaderFactory lexReader = null;
-        String operators = "+-*/%=!^&|<>";
-
-        while (ptr < buffer.length && buffer[ptr] != '\0') {
-            if (Character.isDigit(buffer[ptr])) {
-                lexReader = new NumReaderFactory();
-            } else if (Character.isAlphabetic(buffer[ptr])) {
-                lexReader = new IdReaderFactory();
-            } else if (isPartOfPattern(operators, buffer[ptr])) {
-                lexReader = new OpReaderFactory();
-            }
-
-            // Process token
-            if (lexReader != null) {
-                Token token = lexReader.reader(buffer, ptr);
-                lexer.symbolTable.put(token.toString(), token);
-                ptr += token.toString().length();
-            } else {
-                ptr++;
-            }
-
-            lexReader = null;
-        }
-    }
+    public Hashtable<String, Token> getSymbolTable()    { return symbolTable; }
+    public int getLineCount()                           { return lineCount; }
 
 }
