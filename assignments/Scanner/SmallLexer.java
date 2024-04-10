@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  * A small lexer that scans a PASCAL-like language.
@@ -9,11 +9,24 @@ import java.util.Hashtable;
  */
 public class SmallLexer {
 
-    private static Hashtable<String, String> symbolHashtable; // <token-name, token-attribute>
+    private static HashMap<String, String> symbolTable; // <token-name, token-attribute>
+    private static final String keywordAttribute = "keyword";
+
+    private static void reserveSymbolTable() {
+        symbolTable.put("program", keywordAttribute);
+        symbolTable.put("begin", keywordAttribute);
+        symbolTable.put("end", keywordAttribute);
+        symbolTable.put("if", keywordAttribute);
+        symbolTable.put("else_if", keywordAttribute);
+        symbolTable.put("else", keywordAttribute);
+        symbolTable.put("while", keywordAttribute);
+        symbolTable.put("int", keywordAttribute);
+        symbolTable.put("print_line", keywordAttribute);
+    }
 
     /**
-     * Processes the given source code file using the double-buffer method.
-     * Using fixed sized buffers, the file is iteratively read and processed.
+     * Processes the given source code file.
+     * The file is iteratively read line-by-line and processed.
      * 
      * @param args The name of the input source code file
      */
@@ -28,81 +41,86 @@ public class SmallLexer {
         try {
             FileReader fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            
-            // initialize the double buffer, fixed size
-            char[][] doubleBuffer = new char[2][4096];
-            int currentBuffer = 0;
-            int bytesRead;
-            
-            // initial read
-            bytesRead = bufferedReader.read(doubleBuffer[currentBuffer]);
-            
-            // until EOF, read and process buffer-by-buffer by switching iteratively
-            while (bytesRead != -1) {
-                processBuffer(doubleBuffer[currentBuffer], bytesRead);
+            String line;
 
-                currentBuffer = (currentBuffer + 1) % 2; // 0 <-> 1
-                bytesRead = bufferedReader.read(doubleBuffer[currentBuffer]);
+            symbolTable = new HashMap<String, String>();
+            reserveSymbolTable();
+
+            while ((line = bufferedReader.readLine()) != null) {
+                line += '\n';
+                scanBuffer(line.toCharArray(), line.length());
             }
             
             bufferedReader.close();
+            fileReader.close();
             
         } catch (IOException e) {
             System.err.println("Error reading file: " + filename);
             e.printStackTrace();
         }
-
-        // TODO
-        // another pass through the input file
-        
-        // TODO
-        // match each unit with an entry/token in the symbolHashtable
-
-        // TODO
-        // print pairs to file: name - attribute
     }
-    
+
     /**
      * Given a buffer of source code, creates and fills in the corresponding tokens to the symbol table.
      * 
      * @param buf The buffer to be read, contains source code
      * @param length The length of the buffer, either up to EOF or end of buffer
      */
-    public static void processBuffer(char[] buf, int length) {
+    public static void scanBuffer(char[] buf, int length) {
         int ptr = 0;
-        DFAReaderFactory NFAScanner = null;
+        DFAScanner scanner = null;
 
         while (ptr < length) {
-            switch (peek(buf, ptr)) {
-                case '\"':
-                    NFAScanner = new StringLiteralDFAReaderFactory();
-                    break;
+            char lookahead = peek(buf, ptr);
 
-                // TODO
-                // number
-                    
-                case '-':
-                    if (peek(buf, ptr + 1) == '-') {
-                        // TODO
-                        // comment
-                    } else {
-                        // TODO
-                        // subtraction operator
-                    }
-                    break;
-
-                // TODO
-                // identifier
-
-                // TODO
-                // operators
-            
-                default:
-                    break;
+            // skip whitespace
+            if (Character.isWhitespace(lookahead)) {
+                ptr++;
+                continue;
             }
 
-            Token token = NFAScanner.scanLexUnit(buf, ptr);
-            symbolHashtable.put(token.getTokenName(), token.getTokenAttribute());
+            if (lookahead == '\"') {
+                scanner = new StringLiteralDFAScanner();
+            } else if (Character.isDigit(lookahead)) {
+                scanner = new NumberLiteralDFAScanner();
+            } else if (lookahead == '-') {
+                if (peek(buf, ptr + 1) == '-') {
+                    scanner = new CommentDFAScanner();
+                } else {
+                    scanner = new SubtractionOperatorDFAScanner();
+                }
+            } else if (lookahead == '+') {
+                scanner = new AdditionOperatorDFAScanner();
+            } else if (lookahead == '*') {
+                scanner = new MultiplicationOperatorDFAScanner();
+            } else if (lookahead == '=') {
+                scanner = new AssignmentOperatorDFAScanner();
+            } else if (lookahead == '<') {
+                scanner = new LessThanOperatorDFAScanner();
+            } else if (lookahead == '>') {
+                scanner = new GreaterThanOperatorDFAScanner();
+            } else if (lookahead == '(') {
+                scanner = new LeftParenthesisOperatorDFAScanner();
+            } else if (lookahead == ')') {
+                scanner = new RightParenthesisOperatorDFAScanner();
+            } else if (lookahead == ';') {
+                scanner = new StatementTerminatorOperatorDFAScanner();
+            } else if (lookahead == ',') {
+                scanner = new CommaPunctuationOperatorDFAScanner();
+            } else if (lookahead == '$' || Character.isAlphabetic(lookahead)) {
+                scanner = new IdentifierDFAScanner();
+            } else { // error state
+                scanner = new ErrorDFAScanner(lookahead);
+            }
+
+            Token token = scanner.scanLexUnit(buf, ptr);
+
+            // check if token is a keyword (null check first)
+            if ((symbolTable.get(token.getTokenName()) == null) || (symbolTable.get(token.getTokenName()) != keywordAttribute)) {
+                symbolTable.put(token.getTokenName(), token.getTokenAttribute());
+            }
+
+            System.out.println(token.getTokenName() + "\t\t" + symbolTable.get(token.getTokenName()));
 
             ptr += token.getTokenName().length();
         }
@@ -117,6 +135,10 @@ public class SmallLexer {
      * @return Returns the value read at the position in the buffer
      */
     private static char peek(char[] buf, int pos) {
+        if (pos >= buf.length) {
+            return '\0';
+        }
+
         return buf[pos];
     }
 
