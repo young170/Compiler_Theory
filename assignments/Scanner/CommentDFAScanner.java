@@ -2,10 +2,6 @@ import java.util.ArrayList;
 
 public class CommentDFAScanner extends DFAScanner {
     
-    /**
-     * "other" input chars are excluded from the inputChar ArrayList.
-     * This is to create an exclusion and therefore make it easier to distinguish.
-     */
     public CommentDFAScanner() {
         tokenAttribute = "comment";
 

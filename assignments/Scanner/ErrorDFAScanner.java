@@ -2,10 +2,6 @@ import java.util.ArrayList;
 
 public class ErrorDFAScanner extends DFAScanner {
     
-    /**
-     * "other" input chars are excluded from the inputChar ArrayList.
-     * This is to create an exclusion and therefore make it easier to distinguish.
-     */
     public ErrorDFAScanner(char error_ch) {
         tokenAttribute = "illegal ID starting with wrong character";
 

@@ -3,10 +3,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-/**
- * A small lexer that scans a PASCAL-like language.
- * Given a input source code file, fills in the symbol table and outputs a file of the token pairs: name-attribute
- */
 public class SmallLexer {
 
     private static HashMap<String, String> symbolTable; // <token-name, token-attribute>
@@ -24,12 +20,6 @@ public class SmallLexer {
         symbolTable.put("print_line", keywordAttribute);
     }
 
-    /**
-     * Processes the given source code file.
-     * The file is iteratively read line-by-line and processed.
-     * 
-     * @param args The name of the input source code file
-     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java SmallLexer <filename>");
@@ -60,12 +50,6 @@ public class SmallLexer {
         }
     }
 
-    /**
-     * Given a buffer of source code, creates and fills in the corresponding tokens to the symbol table.
-     * 
-     * @param buf The buffer to be read, contains source code
-     * @param length The length of the buffer, either up to EOF or end of buffer
-     */
     public static void scanBuffer(char[] buf, int length) {
         int ptr = 0;
         DFAScanner scanner = null;
@@ -126,14 +110,6 @@ public class SmallLexer {
         }
     }
 
-    /**
-     * Peeks the value in the specified location of the buffer.
-     * Returns '\0' if is/past EOF
-     * 
-     * @param buf The buffer to be read from
-     * @param pos The position desired to be read in the buffer
-     * @return Returns the value read at the position in the buffer
-     */
     private static char peek(char[] buf, int pos) {
         if (pos >= buf.length) {
             return '\0';
