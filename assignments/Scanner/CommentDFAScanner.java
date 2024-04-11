@@ -16,20 +16,13 @@ public class CommentDFAScanner extends DFAScanner {
             {-1, -1, -1, DFAState.ACCEPT.ordinal()}, // state 3
         };
 
-        boolean[][] advanceTable = {
-            {true, true, true},
-            {true, true, true},
-            {true, false, true},
-            {false, false, false}
-        };
-
         inputChar = new ArrayList<String>();
         // TODO
         // test "\n\0" in cases files don't end with \n
         inputChar.add("-");
         inputChar.add("\n");
 
-        dfa = new DFA(transitionTable, advanceTable, inputChar);
+        dfa = new DFA(transitionTable, inputChar);
     }
 
 }

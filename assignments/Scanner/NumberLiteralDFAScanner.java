@@ -17,20 +17,12 @@ public class NumberLiteralDFAScanner extends DFAScanner {
             {-1, -1, -1, -1, DFAState.ERROR.ordinal()}, // state 4
         };
 
-        boolean[][] advanceTable = {
-            {true, true, true, true},
-            {true, true, false, false},
-            {false, false, false, false},
-            {true, true, false, true},
-            {false, false, false, false}
-        };
-
         inputChar = new ArrayList<String>();
         inputChar.add("0123456789");
         inputChar.add(alphaTokens);
         inputChar.add(tokenDelimiters);
 
-        dfa = new DFA(transitionTable, advanceTable, inputChar);
+        dfa = new DFA(transitionTable, inputChar);
     }
 
 }

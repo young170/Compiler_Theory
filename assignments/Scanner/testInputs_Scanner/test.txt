@@ -1,9 +1,1 @@
-program Exercise 
-	begin  -- comment1
-	   int
-       3begin
-       @begin
-       @@ @@
-       else@
-       r@
-       1@
+id

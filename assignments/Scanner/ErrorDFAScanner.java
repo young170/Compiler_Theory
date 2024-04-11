@@ -15,17 +15,11 @@ public class ErrorDFAScanner extends DFAScanner {
             {-1, -1, -1, DFAState.ACCEPT.ordinal()}, // state 2
         };
 
-        boolean[][] advanceTable = {
-            {true, true, true},
-            {true, false, true},
-            {false, false, false}
-        };
-
         inputChar = new ArrayList<String>();
         inputChar.add(Character.toString(error_ch));
         inputChar.add(tokenDelimiters);
 
-        dfa = new DFA(transitionTable, advanceTable, inputChar);
+        dfa = new DFA(transitionTable, inputChar);
     }
 
 }

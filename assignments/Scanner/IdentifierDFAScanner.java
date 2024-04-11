@@ -15,17 +15,11 @@ public class IdentifierDFAScanner extends DFAScanner {
             {-1, -1, -1, DFAState.ACCEPT.ordinal()}, // state 2
         };
 
-        boolean[][] advanceTable = {
-            {true, true, true},
-            {true, true, false},
-            {false, false, false}
-        };
-
         inputChar = new ArrayList<String>();
         inputChar.add("$" + alphaTokens);
         inputChar.add("_.0123456789");
 
-        dfa = new DFA(transitionTable, advanceTable, inputChar);
+        dfa = new DFA(transitionTable, inputChar);
     }
 
 }
