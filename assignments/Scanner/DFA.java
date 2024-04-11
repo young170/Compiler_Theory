@@ -11,9 +11,9 @@ public class DFA {
     }
 
     public boolean accept(int state) {
-        int isAcceptIdx = transitionTable[state].length - 1;
+        int dfaStateIdx = transitionTable[state].length - 1;
 
-        if (transitionTable[state][isAcceptIdx] == DFAScanner.DFAState.ACCEPT.ordinal()) {
+        if (transitionTable[state][dfaStateIdx] == DFAScanner.DFAState.ACCEPT.ordinal()) {
             return true;
         }
 
@@ -21,9 +21,9 @@ public class DFA {
     }
 
     public boolean error(int state) {
-        int isErrorIdx = transitionTable[state].length - 1;
+        int dfaStateIdx = transitionTable[state].length - 1;
 
-        if (transitionTable[state][isErrorIdx] == DFAScanner.DFAState.ERROR.ordinal()) {
+        if (transitionTable[state][dfaStateIdx] == DFAScanner.DFAState.ERROR.ordinal()) {
             return true;
         }
 
@@ -32,18 +32,19 @@ public class DFA {
 
     public int transition(int state, char sym) {
         // i = inputChar.size(), if "other"
-        return transitionTable[state][stateInputCharIdx(state, sym)];
+        return transitionTable[state][transitionByInputCharIdx(state, sym)];
     }
 
     public boolean advance(int state, char sym) {
-        if (transitionTable[transitionTable[state][stateInputCharIdx(state, sym)]][transitionTable[state].length - 1] == DFAScanner.DFAState.REJECT.ordinal()) {
+        if (transitionTable[transitionTable[state][transitionByInputCharIdx(state, sym)]][transitionTable[state].length - 1]
+                == DFAScanner.DFAState.REJECT.ordinal()) {
             return true;
         }
 
         return false;
     }
 
-    private int stateInputCharIdx(int state, char sym) {
+    private int transitionByInputCharIdx(int state, char sym) {
         int i = 0;
 
         for (i = 0; i < inputChar.size(); i++) {

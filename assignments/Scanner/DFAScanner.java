@@ -33,11 +33,7 @@ public abstract class DFAScanner {
             return new Token(tokenName, tokenAttribute);
         }
 
-        if (dfa.error(curr_state)) {
-            return new Token(tokenName, errorTokenAttribute);
-        }
-
-        return null;
+        return new Token(tokenName, errorTokenAttribute);
     }
 
 }

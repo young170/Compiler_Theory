@@ -11,7 +11,7 @@ public class NumberLiteralDFAScanner extends DFAScanner {
 
         int[][] transitionTable = {
             {1, -1, -1, -1, DFAState.REJECT.ordinal()}, // state 0
-            {1, 3, 2, 2, DFAState.REJECT.ordinal()}, // state 1
+            {1, 3, 2, 3, DFAState.REJECT.ordinal()}, // state 1
             {-1, -1, -1, -1, DFAState.ACCEPT.ordinal()}, // state 2
             {3, 3, 4, 3, DFAState.REJECT.ordinal()}, // state 3
             {-1, -1, -1, -1, DFAState.ERROR.ordinal()}, // state 4
