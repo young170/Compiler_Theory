@@ -104,10 +104,14 @@ public class SmallLexer {
                 symbolTable.put(token.getTokenName(), token.getTokenAttribute());
             }
 
-            System.out.println(token.getTokenName() + "\t\t" + symbolTable.get(token.getTokenName()));
+            printTokenPair(token);
 
             ptr += token.getTokenName().length();
         }
+    }
+
+    private static void printTokenPair(Token token) {
+        System.out.println(token.getTokenName() + "\t\t" + symbolTable.get(token.getTokenName()));
     }
 
     private static char peek(char[] buf, int pos) {
