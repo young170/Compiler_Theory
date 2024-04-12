@@ -1,11 +1,14 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SmallLexer {
 
     private static HashMap<String, String> symbolTable; // <token-name, token-attribute>
+    private static ArrayList<Token> tokenList;
+
     private static final String keywordAttribute = "keyword";
 
     private static void reserveSymbolTable() {
@@ -33,6 +36,7 @@ public class SmallLexer {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
 
+            tokenList = new ArrayList<Token>();
             symbolTable = new HashMap<String, String>();
             reserveSymbolTable();
 
@@ -47,6 +51,10 @@ public class SmallLexer {
         } catch (IOException e) {
             System.err.println("Error reading file: " + filename);
             e.printStackTrace();
+        }
+
+        for (Token token : tokenList) {
+            printTokenPair(token);
         }
     }
 
@@ -104,7 +112,7 @@ public class SmallLexer {
                 symbolTable.put(token.getTokenName(), token.getTokenAttribute());
             }
 
-            printTokenPair(token);
+            tokenList.add(token);
 
             ptr += token.getTokenName().length();
         }
