@@ -130,4 +130,8 @@ public class SmallLexer {
         return buf[pos];
     }
 
+    public ArrayList<Token> getTokenList() {
+        return tokenList;
+    }
+
 }
