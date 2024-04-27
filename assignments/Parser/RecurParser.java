@@ -10,9 +10,10 @@ public class RecurParser {
         System.out.println("==================");
         System.out.println("Parsing failed");
         System.out.println(errorMsg);
-        System.out.println("error token: " + tokenList.get(tokenIdx).getTokenName());
+        System.out.println("error token: " + currTokenName());
         System.out.println("==================");
-        // TODO quit parsing process
+        
+        System.exit(1);
     }
 
     private void advanceToken() {
@@ -20,6 +21,7 @@ public class RecurParser {
     }
 
     private void match(String expectedToken) {
+        System.out.println("matching: " + currTokenName() + "..." + expectedToken);
         if (currTokenName().equals(expectedToken)) {
             advanceToken();
         } else {
@@ -47,7 +49,7 @@ public class RecurParser {
         }
 
         SmallLexer smallLexer = new SmallLexer();
-        smallLexer.setPrintTokenList(true);
+        smallLexer.setPrintTokenList(false);
         smallLexer.lex(args[0]);
 
         RecurParser recurParser = new RecurParser(smallLexer.getTokenList());
@@ -89,16 +91,21 @@ public class RecurParser {
     }
 
     public void compoundStatement() {
-        errorMsg = "begin missing"; // set error msg
+        errorMsg = "begin missing";
         match("begin");
+        errorMsg = "end missing";
 
         statement();
         while (currTokenName().equals(";")) {
             match(";");
+
+            if (currTokenName().equals("end")) {
+                break;
+            }
+            
             statement();
         }
 
-        errorMsg = "end missing"; // set error msg
         match("end");
     }
 
@@ -131,9 +138,6 @@ public class RecurParser {
         // <declaration statement>
         else if (isType(currTokenName())) {
             declarationStatement();
-        } else {
-            errorMsg = "statement parse error";
-            match("");
         }
     }
 
@@ -146,7 +150,7 @@ public class RecurParser {
     public void printStatement() {
         match("print_line");
         match("(");
-        if (currTokenAttribute().equals("string_literal")) {
+        if (currTokenAttribute().equals("string literal")) {
             match(currTokenName());
         }
         match(")");
@@ -172,9 +176,6 @@ public class RecurParser {
     public void variableDeclaration() {
         if (currTokenAttribute().equals("identifier")) {
             match(currTokenName());
-        } else {
-            errorMsg = "variable parse error";
-            match("");
         }
         
         if (currTokenName().equals("=")) {
@@ -186,9 +187,6 @@ public class RecurParser {
     public void identifier() {
         if (currTokenAttribute().equals("identifier")) {
             match(currTokenName());
-        } else {
-            errorMsg = "identifier parse error";
-            match("");
         }
     }
 
@@ -225,13 +223,10 @@ public class RecurParser {
             match(currTokenName());
         } else if (currTokenAttribute().equals("number literal")) {
             match(currTokenName());
-        } else if (currTokenAttribute().equals("(")) {
+        } else if (currTokenName().equals("(")) {
             match("(");
             expression();
             match(")");
-        } else {
-            errorMsg = "factor parse error";
-            match("");
         }
     }
 
