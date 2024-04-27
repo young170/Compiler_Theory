@@ -10,4 +10,7 @@ public class Token {
 
     public String getTokenName() { return tokenName; }
     public String getTokenAttribute() { return tokenAttribute; }
+
+    public void setTokenName(String tokenName) { this.tokenName = tokenName; }
+    public void setTokenAttribute(String tokenAttribute) { this.tokenAttribute = tokenAttribute; }
 }

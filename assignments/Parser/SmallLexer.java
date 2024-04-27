@@ -119,7 +119,7 @@ public class SmallLexer {
                 symbolTable.put(token.getTokenName(), token.getTokenAttribute());
             }
 
-            tokenList.add(token);
+            tokenList.add(new Token(token.getTokenName(), symbolTable.get(token.getTokenName())));
 
             ptr += token.getTokenName().length();
         }

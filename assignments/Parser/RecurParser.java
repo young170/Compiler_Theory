@@ -7,9 +7,11 @@ public class RecurParser {
     private String errorMsg;
 
     private void error() {
+        System.out.println("==================");
         System.out.println("Parsing failed");
         System.out.println(errorMsg);
-        System.out.println(tokenList.get(tokenIdx).getTokenName());
+        System.out.println("error token: " + tokenList.get(tokenIdx).getTokenName());
+        System.out.println("==================");
         // TODO quit parsing process
     }
 
@@ -18,7 +20,6 @@ public class RecurParser {
     }
 
     private void match(String expectedToken) {
-        System.out.println(currTokenName());
         if (currTokenName().equals(expectedToken)) {
             advanceToken();
         } else {
@@ -79,14 +80,21 @@ public class RecurParser {
         }
     }
 
+    public void statement() {
+        if (currTokenName().equals("if")) {
+            ifStatement();
+        } else {
+            simpleStatement();
+        }
+    }
+
     public void compoundStatement() {
         errorMsg = "begin missing"; // set error msg
         match("begin");
 
-        // TODO
-        if (currTokenName().equals("if")) {
-            ifStatement();
-        } else {
+        statement();
+        while (currTokenName().equals(";")) {
+            match(";");
             statement();
         }
 
@@ -111,7 +119,7 @@ public class RecurParser {
         }
     }
 
-    public void statement() {
+    public void simpleStatement() {
         // <assignment statement>
         if (currTokenAttribute().equals("identifier")) {
             assignmentStatement();
@@ -168,7 +176,7 @@ public class RecurParser {
             errorMsg = "variable parse error";
             match("");
         }
-
+        
         if (currTokenName().equals("=")) {
             match("=");
             expression();
