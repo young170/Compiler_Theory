@@ -8,8 +8,8 @@ public class SmallLexer {
 
     private HashMap<String, String> symbolTable; // <token-name, token-attribute>
     private ArrayList<Token> tokenList;
-
     private final String keywordAttribute = "keyword";
+    private boolean printTokenList = true;
 
     private void reserveSymbolTable() {
         symbolTable.put("program", keywordAttribute);
@@ -23,14 +23,16 @@ public class SmallLexer {
         symbolTable.put("print_line", keywordAttribute);
     }
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java SmallLexer <filename>");
-            return;
+    private void printTokenPair(Token token) {
+        System.out.println(token.getTokenName() + "\t\t" + symbolTable.get(token.getTokenName()));
+    }
+
+    private char peek(char[] buf, int pos) {
+        if (pos >= buf.length) {
+            return '\0';
         }
 
-        SmallLexer smallLexer = new SmallLexer();
-        smallLexer.lex(args[0]);
+        return buf[pos];
     }
 
     public void lex(String filename) {
@@ -56,8 +58,10 @@ public class SmallLexer {
             e.printStackTrace();
         }
 
-        for (Token token : tokenList) {
-            printTokenPair(token);
+        if (printTokenList) {
+            for (Token token : tokenList) {
+                printTokenPair(token);
+            }
         }
     }
 
@@ -121,20 +125,12 @@ public class SmallLexer {
         }
     }
 
-    private void printTokenPair(Token token) {
-        System.out.println(token.getTokenName() + "\t\t" + symbolTable.get(token.getTokenName()));
-    }
-
-    private char peek(char[] buf, int pos) {
-        if (pos >= buf.length) {
-            return '\0';
-        }
-
-        return buf[pos];
-    }
-
     public ArrayList<Token> getTokenList() {
         return tokenList;
+    }
+
+    public void setPrintTokenList(Boolean bool) {
+        printTokenList = bool;
     }
 
 }
