@@ -80,7 +80,7 @@ public class RecurParser {
             match("program");
             identifier();
             compoundStatement();
-        }  else {
+        } else {
             errorMsg = "program parse error";
             match("");
         }
