@@ -7,11 +7,8 @@ public class RecurParser {
     private String errorMsg;
 
     private void error() {
-        System.out.println("==================");
-        System.out.println("Parsing failed");
+        System.out.println("Parsing Failed");
         System.out.println(errorMsg);
-        System.out.println("error token: " + currTokenName());
-        System.out.println("==================");
         
         System.exit(1);
     }
@@ -21,7 +18,6 @@ public class RecurParser {
     }
 
     private void match(String expectedToken) {
-        System.out.println("matching: " + currTokenName() + "..." + expectedToken);
         if (currTokenName().equals(expectedToken)) {
             advanceToken();
         } else {
@@ -30,10 +26,18 @@ public class RecurParser {
     }
 
     private String currTokenName() {
+        if (tokenIdx == tokenList.size()) {
+            error();
+        }
+
         return tokenList.get(tokenIdx).getTokenName();
     }
 
     private String currTokenAttribute() {
+        if (tokenIdx == tokenList.size()) {
+            error();
+        }
+
         return tokenList.get(tokenIdx).getTokenAttribute();
     }
     
@@ -83,26 +87,21 @@ public class RecurParser {
     }
 
     public void statement() {
-        if (currTokenName().equals("if")) {
+        if (currTokenName().equals("if")) { // <conditional statement>
             ifStatement();
-        } else {
+        } else { // <simple statement>
             simpleStatement();
+            match(";"); // statement terminator
         }
     }
 
     public void compoundStatement() {
         errorMsg = "begin missing";
         match("begin");
+
         errorMsg = "end missing";
-
         statement();
-        while (currTokenName().equals(";")) {
-            match(";");
-
-            if (currTokenName().equals("end")) {
-                break;
-            }
-            
+        while (!currTokenName().equals("end")) {
             statement();
         }
 
@@ -177,7 +176,7 @@ public class RecurParser {
         if (currTokenAttribute().equals("identifier")) {
             match(currTokenName());
         }
-        
+
         if (currTokenName().equals("=")) {
             match("=");
             expression();

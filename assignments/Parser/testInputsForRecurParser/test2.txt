@@ -11,7 +11,7 @@ program Exercise
 	   		else 
 		begin
       		 print_line("Good evening.");
-    		end
+    		end;
  		print_line("Good morning.");
 		 Hour.In.Day = 24;
 	end 
