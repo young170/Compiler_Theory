@@ -19,7 +19,10 @@ public class SmallLexer {
         symbolTable.put("else_if", keywordAttribute);
         symbolTable.put("else", keywordAttribute);
         symbolTable.put("while", keywordAttribute);
+        symbolTable.put("for", keywordAttribute);
         symbolTable.put("int", keywordAttribute);
+        symbolTable.put("integer", keywordAttribute);
+        symbolTable.put("display", keywordAttribute);
         symbolTable.put("print_line", keywordAttribute);
     }
 
@@ -58,7 +61,7 @@ public class SmallLexer {
             e.printStackTrace();
         }
 
-        if (printTokenList) {
+        if (printTokenList) { // printing token list controller
             for (Token token : tokenList) {
                 printTokenPair(token);
             }
@@ -107,7 +110,7 @@ public class SmallLexer {
                 inputChar.add(DFAScanner.alphaTokens);
                 inputChar.add(DFAScanner.tokenDelimiters);
             } else if (lookahead == '-') {
-                if (peek(buf, ptr + 1) == '-') {
+                if (peek(buf, ptr + 1) == '-') { // comment
                     tokenAttribute = "comment";
 
                     transitionTable = new int[4][4];
@@ -129,14 +132,26 @@ public class SmallLexer {
                     inputChar.add("-");
                 }
             } else if (lookahead == '+') {
-                tokenAttribute = "plus operator";
+                if (peek(buf, ptr + 1) == '+') { // increment operator
+                    tokenAttribute = "increment operator";
 
-                transitionTable = new int[3][3];
-                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
-                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
-                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+                    transitionTable = new int[4][3];
+                    transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{2, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{-1, 3, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[3] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
 
-                inputChar.add("+");
+                    inputChar.add("+");
+                } else { // plus operator
+                    tokenAttribute = "plus operator";
+
+                    transitionTable = new int[3][3];
+                    transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                    inputChar.add("+");
+                }
             } else if (lookahead == '*') {
                 tokenAttribute = "multiplication operator";
 
@@ -147,14 +162,26 @@ public class SmallLexer {
 
                 inputChar.add("*");
             } else if (lookahead == '=') {
-                tokenAttribute = "assignment operator";
+                if (peek(buf, ptr + 1) == '=') { // equality operator
+                    tokenAttribute = "equality operator";
 
-                transitionTable = new int[3][3];
-                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
-                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
-                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+                    transitionTable = new int[4][3];
+                    transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{2, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{-1, 3, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[3] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
 
-                inputChar.add("=");
+                    inputChar.add("=");
+                } else { // assignment operator
+                    tokenAttribute = "assignment operator";
+
+                    transitionTable = new int[3][3];
+                    transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                    inputChar.add("=");
+                }
             } else if (lookahead == '<') {
                 tokenAttribute = "less than operator";
 
@@ -232,7 +259,6 @@ public class SmallLexer {
             }
 
             scanner = new DFAScanner(tokenAttribute, transitionTable, inputChar);
-
             Token token = scanner.scanLexUnit(buf, ptr);
 
             // check if token is a keyword (null check first)
@@ -241,6 +267,8 @@ public class SmallLexer {
             }
 
             tokenList.add(new Token(token.getTokenName(), symbolTable.get(token.getTokenName())));
+
+            printTokenPair(token);
 
             ptr += token.getTokenName().length();
         }

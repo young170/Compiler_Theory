@@ -9,8 +9,8 @@ public class LLParser {
         smallLexer.setPrintTokenList(true);
         smallLexer.lex(args[0]);
 
-        LLParser llParser = new LLParser();
-        
+        // LLParser llParser = new LLParser();
+
 
         System.out.println("Parsing OK");
     }
