@@ -6,11 +6,11 @@ public class LLParser {
         }
 
         SmallLexer smallLexer = new SmallLexer();
-        smallLexer.setPrintTokenList(false);
+        smallLexer.setPrintTokenList(true);
         smallLexer.lex(args[0]);
 
         LLParser llParser = new LLParser();
-
+        
 
         System.out.println("Parsing OK");
     }

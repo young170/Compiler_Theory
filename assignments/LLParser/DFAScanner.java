@@ -1,16 +1,24 @@
 import java.util.ArrayList;
 
-public abstract class DFAScanner {
+public class DFAScanner {
 
-    protected String tokenAttribute;
-    protected ArrayList<String> inputChar;
-    protected DFA dfa;
-    protected int[][] transitionTable;
+    private String tokenAttribute;
+    private ArrayList<String> inputChar;
+    private DFA dfa;
+    private int[][] transitionTable;
 
     public enum DFAState { REJECT, ACCEPT, ERROR }
     public static final String tokenDelimiters = "\"-+*=<>();, \t\n\r\f\u000B";
     public static final String alphaTokens = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String errorTokenAttribute = "illegal ID starting with wrong character";
+
+    public DFAScanner(String tokenAttribute, int[][] transitionTable, ArrayList<String> inputChar) {
+        this.tokenAttribute = tokenAttribute;
+        this.transitionTable = transitionTable;
+        this.inputChar = inputChar;
+
+        this.dfa = new DFA(transitionTable, inputChar);
+    }
 
     public Token scanLexUnit (char[] buffer, int ptr) {
         String tokenName = "";

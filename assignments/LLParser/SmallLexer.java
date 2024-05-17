@@ -72,6 +72,11 @@ public class SmallLexer {
         while (ptr < length) {
             char lookahead = peek(buf, ptr);
 
+            // DFAScanner attributes
+            String tokenAttribute = new String();
+            int[][] transitionTable = new int[0][0];
+            ArrayList<String> inputChar = new ArrayList<String>();
+
             // skip whitespace
             if (Character.isWhitespace(lookahead)) {
                 ptr++;
@@ -79,38 +84,154 @@ public class SmallLexer {
             }
 
             if (lookahead == '\"') {
-                scanner = new StringLiteralDFAScanner();
+                tokenAttribute = "string literal";
+
+                transitionTable = new int[4][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()}; // state 0
+                transitionTable[1] = new int[]{2, 1, DFAScanner.DFAState.REJECT.ordinal()};  // state 1
+                transitionTable[2] = new int[]{-1, 3, DFAScanner.DFAState.REJECT.ordinal()}; // state 2
+                transitionTable[3] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()}; // state 3
+
+                inputChar.add("\"");
             } else if (Character.isDigit(lookahead)) {
-                scanner = new NumberLiteralDFAScanner();
+                tokenAttribute = "number literal";
+
+                transitionTable = new int[5][5];
+                transitionTable[0] = new int[]{1, -1, -1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{1, 3, 2, 3, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, -1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+                transitionTable[3] = new int[]{3, 3, 4, 3, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[4] = new int[]{-1, -1, -1, -1, DFAScanner.DFAState.ERROR.ordinal()};
+
+                inputChar.add("0123456789");
+                inputChar.add(DFAScanner.alphaTokens);
+                inputChar.add(DFAScanner.tokenDelimiters);
             } else if (lookahead == '-') {
                 if (peek(buf, ptr + 1) == '-') {
-                    scanner = new CommentDFAScanner();
-                } else {
-                    scanner = new SubtractionOperatorDFAScanner();
+                    tokenAttribute = "comment";
+
+                    transitionTable = new int[4][4];
+                    transitionTable[0] = new int[]{1, -1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{2, -1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{2, 3, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[3] = new int[]{-1, -1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                    inputChar.add("-");
+                    inputChar.add("\n");
+                } else { // subtraction operatorr
+                    tokenAttribute = "subtraction operator";
+
+                    transitionTable = new int[3][3];
+                    transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                    transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                    inputChar.add("-");
                 }
             } else if (lookahead == '+') {
-                scanner = new AdditionOperatorDFAScanner();
+                tokenAttribute = "plus operator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("+");
             } else if (lookahead == '*') {
-                scanner = new MultiplicationOperatorDFAScanner();
+                tokenAttribute = "multiplication operator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("*");
             } else if (lookahead == '=') {
-                scanner = new AssignmentOperatorDFAScanner();
+                tokenAttribute = "assignment operator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("=");
             } else if (lookahead == '<') {
-                scanner = new LessThanOperatorDFAScanner();
+                tokenAttribute = "less than operator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("<");
             } else if (lookahead == '>') {
-                scanner = new GreaterThanOperatorDFAScanner();
+                tokenAttribute = "greater than operator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add(">");
             } else if (lookahead == '(') {
-                scanner = new LeftParenthesisOperatorDFAScanner();
+                tokenAttribute = "left parenthesis";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("(");
             } else if (lookahead == ')') {
-                scanner = new RightParenthesisOperatorDFAScanner();
+                tokenAttribute = "right parenthesis";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add(")");
             } else if (lookahead == ';') {
-                scanner = new StatementTerminatorOperatorDFAScanner();
+                tokenAttribute = "statement terminator";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add(";");
             } else if (lookahead == ',') {
-                scanner = new CommaPunctuationOperatorDFAScanner();
+                tokenAttribute = "punctuation - comma";
+
+                transitionTable = new int[3][3];
+                transitionTable[0] = new int[]{1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{-1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add(",");
             } else if (lookahead == '$' || Character.isAlphabetic(lookahead)) {
-                scanner = new IdentifierDFAScanner();
+                tokenAttribute = "identifier";
+
+                transitionTable = new int[3][4];
+                transitionTable[0] = new int[]{1, -1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{1, 1, 2, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add("$" + DFAScanner.alphaTokens);
+                inputChar.add("_.0123456789");
             } else { // error state
-                scanner = new ErrorDFAScanner(lookahead);
+                tokenAttribute = "illegal ID starting with wrong character";
+
+                transitionTable = new int[3][4];
+                transitionTable[0] = new int[]{1, -1, -1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[1] = new int[]{1, 2, 1, DFAScanner.DFAState.REJECT.ordinal()};
+                transitionTable[2] = new int[]{-1, -1, -1, DFAScanner.DFAState.ACCEPT.ordinal()};
+
+                inputChar.add(Character.toString(lookahead));
+                inputChar.add(DFAScanner.tokenDelimiters);
             }
+
+            scanner = new DFAScanner(tokenAttribute, transitionTable, inputChar);
 
             Token token = scanner.scanLexUnit(buf, ptr);
 
