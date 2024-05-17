@@ -268,8 +268,6 @@ public class SmallLexer {
 
             tokenList.add(new Token(token.getTokenName(), symbolTable.get(token.getTokenName())));
 
-            printTokenPair(token);
-
             ptr += token.getTokenName().length();
         }
     }
