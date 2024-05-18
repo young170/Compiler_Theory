@@ -22,6 +22,7 @@ public class SmallLexer {
         symbolTable.put("else", keywordAttribute);
         symbolTable.put("while", keywordAttribute);
         symbolTable.put("for", keywordAttribute);
+        symbolTable.put("break", keywordAttribute);
         symbolTable.put("int", keywordAttribute);
         symbolTable.put("integer", keywordAttribute);
         symbolTable.put("display", keywordAttribute);
@@ -102,7 +103,7 @@ public class SmallLexer {
             }
 
             if (lookahead == '\"') {
-                tokenAttribute = "string literal";
+                tokenAttribute = "string_literal";
 
                 transitionTable = new int[][]{
                     {1, -1, DFAScanner.DFAState.REJECT.ordinal()},
@@ -113,7 +114,7 @@ public class SmallLexer {
 
                 inputChar.add("\"");
             } else if (Character.isDigit(lookahead)) {
-                tokenAttribute = "number literal";
+                tokenAttribute = "number_literal";
 
                 transitionTable = new int[][]{
                     {1, -1, -1, -1, DFAScanner.DFAState.REJECT.ordinal()},
@@ -220,6 +221,10 @@ public class SmallLexer {
 
     public ArrayList<Token> getTokenList() {
         return tokenList;
+    }
+
+    public HashMap<String, String> getSymbolTable() {
+        return symbolTable;
     }
 
     public void setPrintTokenList(Boolean bool) {

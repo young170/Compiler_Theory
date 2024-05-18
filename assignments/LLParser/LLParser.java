@@ -69,10 +69,243 @@ public class LLParser {
         tableSTMT.put("integer", "SIMPLE_STMT ;");
         parsingTable.put("STMT", tableSTMT);
 
+        // CONDITIONAL_STMT
+        Map<String, String> tableCONDITIONAL_STMT = new HashMap<>();
+        tableCONDITIONAL_STMT.put("if", "if EXPRESSION COMPOUND_STMT ELSE_IF_STMT ELSE_STMT");
+        parsingTable.put("CONDITIONAL_STMT", tableCONDITIONAL_STMT);
+
+        // ELSE_STMT
+        Map<String, String> tableELSE_STMT = new HashMap<>();
+        tableELSE_STMT.put("end", "");
+        tableELSE_STMT.put("if", "");
+        tableELSE_STMT.put("else", "else COMPOUND_STMT");
+        tableELSE_STMT.put("while", "");
+        tableELSE_STMT.put("for", "");
+        tableELSE_STMT.put("print_line", "");
+        tableELSE_STMT.put("display", "");
+        tableELSE_STMT.put("break", "");
+        tableELSE_STMT.put("identifier", "");
+        tableELSE_STMT.put("int", "");
+        tableELSE_STMT.put("integer", "");
+        parsingTable.put("ELSE_STMT", tableELSE_STMT);
+
+        // ELSE_IF_STMT
+        Map<String, String> tableELSE_IF_STMT = new HashMap<>();
+        tableELSE_IF_STMT.put("end", "");
+        tableELSE_IF_STMT.put("if", "");
+        tableELSE_IF_STMT.put("else_if", "else_if EXPRESSION COMPOUND_STMT ELSE_IF_STMT");
+        tableELSE_IF_STMT.put("else", "");
+        tableELSE_IF_STMT.put("while", "");
+        tableELSE_IF_STMT.put("for", "");
+        tableELSE_IF_STMT.put("print_line", "");
+        tableELSE_IF_STMT.put("display", "");
+        tableELSE_IF_STMT.put("break", "");
+        tableELSE_IF_STMT.put("identifier", "");
+        tableELSE_IF_STMT.put("int", "");
+        tableELSE_IF_STMT.put("integer", "");
+        parsingTable.put("ELSE_IF_STMT", tableELSE_IF_STMT);
+
+        // WHILE_STMT
+        Map<String, String> tableWHILE_STMT = new HashMap<>();
+        tableWHILE_STMT.put("while", "while EXPRESSION COMPOUND_STMT");
+        parsingTable.put("WHILE_STMT", tableWHILE_STMT);
+
+        // FOR_STMT
+        Map<String, String> tableFOR_STMT = new HashMap<>();
+        tableFOR_STMT.put("for", "for ( DECLARATION_STMT ; EXPRESSION ; EXPRESSION ) COMPOUND_STMT");
+        parsingTable.put("FOR_STMT", tableFOR_STMT);
+
+        // SIMPLE_STMT
+        Map<String, String> tableSIMPLE_STMT = new HashMap<>();
+        tableSIMPLE_STMT.put("print_line", "PRINT_STMT");
+        tableSIMPLE_STMT.put("display", "DISPLAY_STMT");
+        tableSIMPLE_STMT.put("break", "BREAK_STMT");
+        tableSIMPLE_STMT.put("identifier", "ASSIGNMENT_STMT");
+        tableSIMPLE_STMT.put("int", "DECLARATION_STMT");
+        tableSIMPLE_STMT.put("integer", "DECLARATION_STMT");
+        parsingTable.put("SIMPLE_STMT", tableSIMPLE_STMT);
+
+        // ASSIGNMENT_STMT
+        Map<String, String> tableASSIGNMENT_STMT = new HashMap<>();
+        tableASSIGNMENT_STMT.put("identifier", "IDENTIFIER = EXPRESSION");
+        parsingTable.put("ASSIGNMENT_STMT", tableASSIGNMENT_STMT);
+
+        // PRINT_STMT
+        Map<String, String> tablePRINT_STMT = new HashMap<>();
+        tablePRINT_STMT.put("print_line", "print_line ( PRINT_STMT_PRIME )");
+        parsingTable.put("PRINT_STMT", tablePRINT_STMT);
+
+        // PRINT_STMT_PRIME
+        Map<String, String> tablePRINT_STMT_PRIME = new HashMap<>();
+        tablePRINT_STMT_PRIME.put("string_literal", "STRING_LITERAL");
+        tablePRINT_STMT_PRIME.put("identifier", "IDENTIFIER");
+        parsingTable.put("PRINT_STMT_PRIME", tablePRINT_STMT_PRIME);
+
+        // DECLARATION_STMT
+        Map<String, String> tableDECLARATION_STMT = new HashMap<>();
+        tableDECLARATION_STMT.put("int", "TYPE VARIABLE_DECLARATION VARIABLE_DECLARATIONS");
+        tableDECLARATION_STMT.put("integer", "TYPE VARIABLE_DECLARATION VARIABLE_DECLARATIONS");
+        parsingTable.put("DECLARATION_STMT", tableDECLARATION_STMT);
+
+        // VARIABLE_DECLARATIONS
+        Map<String, String> tableVARIABLE_DECLARATIONS = new HashMap<>();
+        tableVARIABLE_DECLARATIONS.put(";", "");
+        tableVARIABLE_DECLARATIONS.put(",", ", VARIABLE_DECLARATION VARIABLE_DECLARATIONS");
+        parsingTable.put("VARIABLE_DECLARATIONS", tableVARIABLE_DECLARATIONS);
+
+        // VARIABLE_DECLARATION
+        Map<String, String> tableVARIABLE_DECLARATION = new HashMap<>();
+        tableVARIABLE_DECLARATION.put("identifier", "IDENTIFIER VARIABLE_DECLARATION_PRIME");
+        parsingTable.put("VARIABLE_DECLARATION", tableVARIABLE_DECLARATION);
+
+        // VARIABLE_DECLARATION_PRIME
+        Map<String, String> tableVARIABLE_DECLARATION_PRIME = new HashMap<>();
+        tableVARIABLE_DECLARATION_PRIME.put(",", "");
+        tableVARIABLE_DECLARATION_PRIME.put("=", "= EXPRESSION");
+        tableVARIABLE_DECLARATION_PRIME.put(";", "");
+        parsingTable.put("VARIABLE_DECLARATION_PRIME", tableVARIABLE_DECLARATION_PRIME);
+
+        // DISPLAY_STMT
+        Map<String, String> tableDISPLAY_STMT = new HashMap<>();
+        tableDISPLAY_STMT.put("display", "display ( STRING_LITERAL )");
+        parsingTable.put("DISPLAY_STMT", tableDISPLAY_STMT);
+
+        // BREAK_STMT
+        Map<String, String> tableBREAK_STMT = new HashMap<>();
+        tableBREAK_STMT.put("break", "break");
+        parsingTable.put("BREAK_STMT", tableBREAK_STMT);
+
         // IDENTIFIER
         Map<String, String> tableIDENTIFIER = new HashMap<>();
-        tableIDENTIFIER.put("Test3", "Test3");
+        tableIDENTIFIER.put("identifier", "identifier");
+        tableIDENTIFIER.put("keyword", "keyword");
         parsingTable.put("IDENTIFIER", tableIDENTIFIER);
+
+        // EXPRESSION
+        Map<String, String> tableEXPRESSION = new HashMap<>();
+        tableEXPRESSION.put("(", "SIMPLE_EXPRESSION EXPRESSION_PRIME");
+        tableEXPRESSION.put("identifier", "SIMPLE_EXPRESSION EXPRESSION_PRIME");
+        tableEXPRESSION.put("number_literal", "SIMPLE_EXPRESSION EXPRESSION_PRIME");
+        parsingTable.put("EXPRESSION", tableEXPRESSION);
+
+        // EXPRESSION_PRIME
+        Map<String, String> tableEXPRESSION_PRIME = new HashMap<>();
+        tableEXPRESSION_PRIME.put("begin", "");
+        tableEXPRESSION_PRIME.put(";", "");
+        tableEXPRESSION_PRIME.put(")", "");
+        tableEXPRESSION_PRIME.put(",", "");
+        tableEXPRESSION_PRIME.put("<", "RELATIONAL_OPERATOR SIMPLE_EXPRESSION");
+        tableEXPRESSION_PRIME.put(">", "RELATIONAL_OPERATOR SIMPLE_EXPRESSION");
+        tableEXPRESSION_PRIME.put("==", "RELATIONAL_OPERATOR SIMPLE_EXPRESSION");
+        parsingTable.put("EXPRESSION_PRIME", tableEXPRESSION_PRIME);
+
+        // SIMPLE_EXPRESSION
+        Map<String, String> tableSIMPLE_EXPRESSION = new HashMap<>();
+        tableSIMPLE_EXPRESSION.put("begin", "");
+        tableSIMPLE_EXPRESSION.put(";", "");
+        tableSIMPLE_EXPRESSION.put("(", "TERM SIMPLE_EXPRESSION_PRIME");
+        tableSIMPLE_EXPRESSION.put(")", "");
+        tableSIMPLE_EXPRESSION.put("identifier", "TERM SIMPLE_EXPRESSION_PRIME");
+        tableSIMPLE_EXPRESSION.put("number_literal", "TERM SIMPLE_EXPRESSION_PRIME");
+        tableSIMPLE_EXPRESSION.put(",", "");
+        tableSIMPLE_EXPRESSION.put("<", "");
+        tableSIMPLE_EXPRESSION.put(">", "");
+        tableSIMPLE_EXPRESSION.put("==", "");
+        parsingTable.put("SIMPLE_EXPRESSION", tableSIMPLE_EXPRESSION);
+
+        // SIMPLE_EXPRESSION_PRIME
+        Map<String, String> tableSIMPLE_EXPRESSION_PRIME = new HashMap<>();
+        tableSIMPLE_EXPRESSION_PRIME.put("begin", "");
+        tableSIMPLE_EXPRESSION_PRIME.put(";", "");
+        tableSIMPLE_EXPRESSION_PRIME.put(")", "");
+        tableSIMPLE_EXPRESSION_PRIME.put(",", "");
+        tableSIMPLE_EXPRESSION_PRIME.put("<", "");
+        tableSIMPLE_EXPRESSION_PRIME.put(">", "");
+        tableSIMPLE_EXPRESSION_PRIME.put("==", "");
+        tableSIMPLE_EXPRESSION_PRIME.put("+", "ADDING_OPERATOR TERM SIMPLE_EXPRESSION_PRIME");
+        tableSIMPLE_EXPRESSION_PRIME.put("-", "ADDING_OPERATOR TERM SIMPLE_EXPRESSION_PRIME");
+        parsingTable.put("SIMPLE_EXPRESSION_PRIME", tableSIMPLE_EXPRESSION_PRIME);
+
+        // TERM
+        Map<String, String> tableTERM = new HashMap<>();
+        tableTERM.put("(", "FACTOR TERM_PRIME");
+        tableTERM.put("identifier", "FACTOR TERM_PRIME");
+        tableTERM.put("number_literal", "FACTOR TERM_PRIME");
+        parsingTable.put("TERM", tableTERM);
+
+        // TERM_PRIME
+        Map<String, String> tableTERM_PRIME = new HashMap<>();
+        tableTERM_PRIME.put("begin", "");
+        tableTERM_PRIME.put(";", "");
+        tableTERM_PRIME.put(")", "");
+        tableTERM_PRIME.put(",", "");
+        tableTERM_PRIME.put("<", "");
+        tableTERM_PRIME.put(">", "");
+        tableTERM_PRIME.put("==", "");
+        tableTERM_PRIME.put("+", "");
+        tableTERM_PRIME.put("-", "");
+        tableTERM_PRIME.put("*", "MULTIPLYING_OPERATOR FACTOR TERM_PRIME");
+        tableTERM_PRIME.put("/", "MULTIPLYING_OPERATOR FACTOR TERM_PRIME");
+        tableTERM_PRIME.put("number_literal", "");
+        parsingTable.put("TERM_PRIME", tableTERM_PRIME);
+
+        // FACTOR
+        Map<String, String> tableFACTOR = new HashMap<>();
+        tableFACTOR.put("(", "( EXPRESSION )");
+        tableFACTOR.put("identifier", "IDENTIFIER FACTOR_PRIME");
+        tableFACTOR.put("number_literal", "NUMBER_LITERAL");
+        parsingTable.put("FACTOR", tableFACTOR);
+
+        // FACTOR_PRIME
+        Map<String, String> tableFACTOR_PRIME = new HashMap<>();
+        tableFACTOR_PRIME.put("begin", "");
+        tableFACTOR_PRIME.put(";", "");
+        tableFACTOR_PRIME.put(")", "");
+        tableFACTOR_PRIME.put(",", "");
+        tableFACTOR_PRIME.put("++", "++");
+        tableFACTOR_PRIME.put("<", "");
+        tableFACTOR_PRIME.put(">", "");
+        tableFACTOR_PRIME.put("==", "");
+        tableFACTOR_PRIME.put("+", "");
+        tableFACTOR_PRIME.put("-", "");
+        tableFACTOR_PRIME.put("*", "");
+        tableFACTOR_PRIME.put("/", "");
+        parsingTable.put("FACTOR_PRIME", tableFACTOR_PRIME);
+
+        // RELATIONAL_OPERATOR
+        Map<String, String> tableRELATIONAL_OPERATOR = new HashMap<>();
+        tableRELATIONAL_OPERATOR.put("<", "<");
+        tableRELATIONAL_OPERATOR.put(">", ">");
+        tableRELATIONAL_OPERATOR.put("==", "==");
+        parsingTable.put("RELATIONAL_OPERATOR", tableRELATIONAL_OPERATOR);
+
+        // ADDING_OPERATOR
+        Map<String, String> tableADDING_OPERATOR = new HashMap<>();
+        tableADDING_OPERATOR.put("+", "+");
+        tableADDING_OPERATOR.put("-", "-");
+        parsingTable.put("ADDING_OPERATOR", tableADDING_OPERATOR);
+
+        // MULTIPLYING_OPERATOR
+        Map<String, String> tableMULTIPLYING_OPERATOR = new HashMap<>();
+        tableMULTIPLYING_OPERATOR.put("*", "*");
+        tableMULTIPLYING_OPERATOR.put("/", "/");
+        parsingTable.put("MULTIPLYING_OPERATOR", tableMULTIPLYING_OPERATOR);
+
+        // STRING_LITERAL
+        Map<String, String> tableSTRING_LITERAL = new HashMap<>();
+        tableSTRING_LITERAL.put("string_literal", "string_literal");
+        parsingTable.put("STRING_LITERAL", tableSTRING_LITERAL);
+
+        // NUMBER_LITERAL
+        Map<String, String> tableNUMBER_LITERAL = new HashMap<>();
+        tableNUMBER_LITERAL.put("number_literal", "number_literal");
+        parsingTable.put("NUMBER_LITERAL", tableNUMBER_LITERAL);
+
+        // TYPE
+        Map<String, String> tableTYPE = new HashMap<>();
+        tableTYPE.put("int", "int");
+        tableTYPE.put("integer", "integer");
+        parsingTable.put("TYPE", tableTYPE);
     }
 
     public static void main(String[] args) {
@@ -93,40 +326,36 @@ public class LLParser {
     }
 
     public void topDownParse() {
+        preprocess(); // remove comments
+
         Stack<String> stack = new Stack<>();
         stack.push("$");
         stack.push("PROGRAM");
+        printStackBottomToTopDriver(stack);
 
         Token token = getNextToken();
 
         while (!stack.isEmpty()) { // PDA accept by empty stack
             String top = stack.pop();
-            System.out.println("[STACK][POP]: " + top);
+            printStackBottomToTopDriver(stack); // POP
 
-            if (isNonTerminal(top)) { // generate
+            if (top.equals(token.getTokenName())) { // match
+                System.out.println("[MATCH] - " + token.getTokenAttribute() + " - " + token.getTokenName()); // MATCH
+                token = getNextToken();
+            } else if (isNonTerminal(top)) { // generate
                 Map<String, String> row = parsingTable.get(top);
 
-                if (row == null || !row.containsKey(token.getTokenName())) {
-                    parsingResultMsg = "Error: unexpected token " + token.getTokenName();
-                    return;
+                // not a keyword
+                if (isIdentifier(token) || isStringLiteral(token) || isNumberLiteral(token)) {
+                    token.setTokenName(token.getTokenAttribute());
                 }
 
                 String production = row.get(token.getTokenName());
-                if (!production.equals("")) {
-                    String[] symbols = production.split(" "); // space separated symbols
-
-                    for (int i = symbols.length - 1; i >= 0; i--) { // push to stack in reverse order
-                        stack.push(symbols[i]);
-                        System.out.println("[STACK][PUSH]: " + symbols[i]);
-                    }
-                }
-            } else if (top.equals(token.getTokenName())) { // match
-                System.out.println("[MATCH]: " + top + "-" + token.getTokenName());
-                token = getNextToken();
+                pushProductionToStack(production, stack);
             } else if (top.equals("")) {
                 continue;
             } else {
-                parsingResultMsg = "Error: unexpected token " + token.getTokenName();
+                parsingResultMsg = "Error: undefined token " + token.getTokenName();
                 return;
             }
         }
@@ -134,12 +363,64 @@ public class LLParser {
         if (token.getTokenName().equals("$")) {
             parsingResultMsg = "Parsing Ok";
         } else {
-            parsingResultMsg = "Error: unexpected token " + token.getTokenName();
+            parsingResultMsg = "Error: expected EOF " + token.getTokenName();
         }
+    }
+
+    private void preprocess() {
+        for (int i = 0; i < tokenList.size(); i++) {
+            if (tokenList.get(i).getTokenAttribute().equals("comment")) {
+                tokenList.remove(i);
+            }
+        }
+    }
+
+    private void pushProductionToStack(String production, Stack<String> stack) {
+        if (!production.equals("")) {
+            String[] symbols = production.split(" "); // space separated symbols
+
+            for (int i = symbols.length - 1; i >= 0; i--) { // push to stack in reverse order
+                stack.push(symbols[i]);
+            }
+        }
+
+        printStackBottomToTopDriver(stack); // PUSH
+    }
+
+    private void printStackBottomToTopDriver(Stack<String> stack) {
+        System.out.print("[");
+        printStackBottomToTop(stack);
+        System.out.print("]\n");
+    }
+
+    private void printStackBottomToTop(Stack<String> stack) {
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        String element = stack.pop();
+
+        printStackBottomToTop(stack);
+
+        System.out.print(" " + element + " ");
+
+        stack.push(element);
     }
 
     private boolean isNonTerminal(String symbol) {
         return parsingTable.containsKey(symbol);
+    }
+
+    private boolean isIdentifier(Token token) {
+        return token.getTokenAttribute().equals("identifier");
+    }
+
+    private boolean isStringLiteral(Token token) {
+        return token.getTokenAttribute().equals("string_literal");
+    }
+
+    private boolean isNumberLiteral(Token token) {
+        return token.getTokenAttribute().equals("number_literal");
     }
 
     private Token getNextToken() {
