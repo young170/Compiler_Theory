@@ -7,16 +7,17 @@ public class LLParser {
 
     private ArrayList<Token> tokenList;
     private int tokenIdx;
-    private String parsingResultMsg;
+    private String parsingErrorMsg;
     private Map<String, Map<String, String>> parsingTable;
+    private Stack<String> parsingStack;
 
-    public LLParser(ArrayList<Token> tokenList) {
-        this.tokenList = tokenList;
-        tokenIdx = 0;
-        initializeParsingTable();
+    private void initializeLL1ParsingStack() {
+        parsingStack = new Stack<>();
+        parsingStack.push("$");
+        parsingStack.push("PROGRAM");
     }
 
-    private void initializeParsingTable() {
+    private void initializeLL1ParsingTable() {
         parsingTable = new HashMap<>();
 
         // PROGRAM
@@ -308,6 +309,13 @@ public class LLParser {
         parsingTable.put("TYPE", tableTYPE);
     }
 
+    public LLParser(ArrayList<Token> tokenList) {
+        this.tokenList = tokenList;
+        tokenIdx = 0;
+        initializeLL1ParsingTable();
+        initializeLL1ParsingStack();
+    }
+
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java LLParser <filename>");
@@ -317,62 +325,83 @@ public class LLParser {
         SmallLexer smallLexer = new SmallLexer();
         smallLexer.setPrintTokenList(false);
         smallLexer.lex(args[0]);
-
+        
         LLParser llParser = new LLParser(smallLexer.getTokenList());
-        llParser.topDownParse();
-
-        // Parsing Result
-        System.out.println(llParser.parsingResultMsg);
+        if (llParser.topDownParse() != 0) {
+            System.out.println(llParser.parsingErrorMsg);
+            System.out.println("Parsing Failed");
+        } else {
+            System.out.println("Parsing Ok");
+        }
     }
 
-    public void topDownParse() {
+    public int topDownParse() {
         preprocess(); // remove comments
-
-        Stack<String> stack = new Stack<>();
-        stack.push("$");
-        stack.push("PROGRAM");
-        printStackBottomToTopDriver(stack);
 
         Token token = getNextToken();
 
-        while (!stack.isEmpty()) { // PDA accept by empty stack
-            String top = stack.pop();
-            printStackBottomToTopDriver(stack); // POP
+        while (!parsingStack.isEmpty()) { // PDA accept by empty stack
+            String TOS = parsingStack.pop();
+            printStack(parsingStack); // POP
 
-            if (top.equals(token.getTokenName())) { // match
-                System.out.println("[MATCH] - " + token.getTokenAttribute() + " - " + token.getTokenName()); // MATCH
+            // token list is empty, but stack is not done
+            if ((token.getTokenName().equals("$")) && !(TOS.equals("$"))) {
+                errorProcess(TOS);
+                return -1;
+            }
+
+            if (TOS.equals(token.getTokenName())) { // match
+                logStack("MATCH", TOS, token.getTokenName());
                 token = getNextToken();
-            } else if (isNonTerminal(top)) { // generate
-                Map<String, String> row = parsingTable.get(top);
+            } else if (isNonTerminal(TOS)) { // generate
+                Map<String, String> row = parsingTable.get(TOS);
 
-                // not a keyword
+                // spelling checked by Lexer
                 if (isIdentifier(token) || isStringLiteral(token) || isNumberLiteral(token)) {
                     token.setTokenName(token.getTokenAttribute());
                 }
 
                 String production = row.get(token.getTokenName());
-                pushProductionToStack(production, stack);
-            } else if (top.equals("")) {
-                continue;
+                pushProductionToStack(production, parsingStack);
             } else {
-                parsingResultMsg = "Error: undefined token " + token.getTokenName();
-                return;
+                errorProcess(TOS);
+                // parsingErrorMsg = "Error: undefined token " + token.getTokenName();
+                return -1;
             }
         }
 
+        // stack and token list is empty
         if (token.getTokenName().equals("$")) {
-            parsingResultMsg = "Parsing Ok";
+            return 0;
         } else {
-            parsingResultMsg = "Error: expected EOF " + token.getTokenName();
+            parsingErrorMsg = "Error: expected EOF " + token.getTokenName();
+            return -1;
         }
     }
 
+    private void logStack(String action, String TOS, String currToken) {
+        System.out.println("[" + action + "] - " + TOS + " - " + currToken);
+    }
+
     private void preprocess() {
-        for (int i = 0; i < tokenList.size(); i++) {
-            if (tokenList.get(i).getTokenAttribute().equals("comment")) {
-                tokenList.remove(i);
-            }
+        tokenList.removeIf(token -> "comment".equals(token.getTokenAttribute()));
+    }
+
+    private void errorProcess(String errorToken) {
+        if (errorToken.equals("STMTS_PRIME")) {
+            parsingErrorMsg = "keyword end not matched";
+        } else if (errorToken.equals("=")) {
+            parsingErrorMsg = "keyword spelling error";
         }
+    }
+
+    private Token getNextToken() {
+        if (tokenIdx < tokenList.size()) {
+            return tokenList.get(tokenIdx++);
+        }
+
+        // EOF
+        return new Token("$", "");
     }
 
     private void pushProductionToStack(String production, Stack<String> stack) {
@@ -384,11 +413,12 @@ public class LLParser {
             }
         }
 
-        printStackBottomToTopDriver(stack); // PUSH
+        printStack(stack); // PUSH
     }
 
-    private void printStackBottomToTopDriver(Stack<String> stack) {
+    private void printStack(Stack<String> stack) {
         System.out.print("[");
+        // stack printing method
         printStackBottomToTop(stack);
         System.out.print("]\n");
     }
@@ -423,12 +453,4 @@ public class LLParser {
         return token.getTokenAttribute().equals("number_literal");
     }
 
-    private Token getNextToken() {
-        if (tokenIdx < tokenList.size()) {
-            return tokenList.get(tokenIdx++);
-        }
-
-        // EOF
-        return new Token("$", "");
-    }
 }
