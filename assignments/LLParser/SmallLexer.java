@@ -46,8 +46,8 @@ public class SmallLexer {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
 
-            tokenList = new ArrayList<>();
             symbolTable = new HashMap<>();
+            tokenList = new ArrayList<>();
             reserveSymbolTable();
 
             while ((line = bufferedReader.readLine()) != null) {

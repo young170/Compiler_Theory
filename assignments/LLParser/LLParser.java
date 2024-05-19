@@ -6,6 +6,7 @@ import java.util.Stack;
 public class LLParser {
 
     private ArrayList<Token> tokenList;
+    private ArrayList<String> declaraedIdentifierList;
     private int tokenIdx;
     private String parsingErrorMsg;
     private Map<String, Map<String, String>> parsingTable;
@@ -311,6 +312,8 @@ public class LLParser {
 
     public LLParser(ArrayList<Token> tokenList) {
         this.tokenList = tokenList;
+        declaraedIdentifierList = new ArrayList<>();
+        declaraedIdentifierList.add("identifier");
         tokenIdx = 0;
         initializeLL1ParsingTable();
         initializeLL1ParsingStack();
@@ -336,7 +339,7 @@ public class LLParser {
     }
 
     public int topDownParse() {
-        preprocess(); // remove comments
+        preprocess();
 
         Token token = getNextToken();
 
@@ -346,7 +349,7 @@ public class LLParser {
 
             // token list is empty, but stack is not done
             if ((token.getTokenName().equals("$")) && !(TOS.equals("$"))) {
-                errorProcess(TOS);
+                errorProcess(TOS, token);
                 return -1;
             }
 
@@ -356,6 +359,13 @@ public class LLParser {
             } else if (isNonTerminal(TOS)) { // generate
                 Map<String, String> row = parsingTable.get(TOS);
 
+                if (isIdentifier(token)) {
+                    if (!isDeclaredIdentifier(token)) {
+                        errorProcess(token.getTokenAttribute(), token);
+                        return -1;
+                    }
+                }
+
                 // spelling checked by Lexer
                 if (isIdentifier(token) || isStringLiteral(token) || isNumberLiteral(token)) {
                     token.setTokenName(token.getTokenAttribute());
@@ -364,7 +374,7 @@ public class LLParser {
                 String production = row.get(token.getTokenName());
                 pushProductionToStack(production, parsingStack);
             } else {
-                errorProcess(TOS);
+                errorProcess(TOS, token);
                 // parsingErrorMsg = "Error: undefined token " + token.getTokenName();
                 return -1;
             }
@@ -384,14 +394,37 @@ public class LLParser {
     }
 
     private void preprocess() {
+        removeComments();
+        addDeclaredIdentifiers();
+    }
+
+    private void removeComments() {
         tokenList.removeIf(token -> "comment".equals(token.getTokenAttribute()));
     }
 
-    private void errorProcess(String errorToken) {
-        if (errorToken.equals("STMTS_PRIME")) {
+    private void addDeclaredIdentifiers() {
+        boolean isDeclarationSTMT = false;
+
+        for (Token token : tokenList) {
+            if (isType(token)) {
+                isDeclarationSTMT = true;
+            } else if (isStatementTerminator(token)) {
+                isDeclarationSTMT = false;
+            }
+
+            if (isIdentifier(token) && isDeclarationSTMT) {
+                declaraedIdentifierList.add(token.getTokenName());
+            }
+        }
+    }
+
+    private void errorProcess(String errorTOS, Token errorToken) {
+        if (errorTOS.equals("STMTS_PRIME")) {
             parsingErrorMsg = "keyword end not matched";
-        } else if (errorToken.equals("=")) {
+        } else if (errorTOS.equals("=") || errorToken.getTokenName().equals("while4")) {
             parsingErrorMsg = "keyword spelling error";
+        } else if (errorTOS.equals("identifier")) {
+            parsingErrorMsg = errorToken.getTokenName() + " not declared";
         }
     }
 
@@ -402,6 +435,10 @@ public class LLParser {
 
         // EOF
         return new Token("$", "");
+    }
+
+    private boolean isDeclaredIdentifier(Token identifier) {
+        return declaraedIdentifierList.contains(identifier.getTokenName());
     }
 
     private void pushProductionToStack(String production, Stack<String> stack) {
@@ -439,6 +476,14 @@ public class LLParser {
 
     private boolean isNonTerminal(String symbol) {
         return parsingTable.containsKey(symbol);
+    }
+
+    private boolean isType(Token token) {
+        return (token.getTokenName().equals("int")) || (token.getTokenName().equals("integer")) || (token.getTokenName().equals("program"));
+    }
+
+    private boolean isStatementTerminator(Token token) {
+        return token.getTokenAttribute().equals("statement terminator");
     }
 
     private boolean isIdentifier(Token token) {
