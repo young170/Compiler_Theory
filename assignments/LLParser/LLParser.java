@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-public class LLParser {
+public class LLparser {
 
     private ArrayList<Token> tokenList;
     private ArrayList<String> declaraedIdentifierList;
@@ -310,7 +310,7 @@ public class LLParser {
         parsingTable.put("TYPE", tableTYPE);
     }
 
-    public LLParser(ArrayList<Token> tokenList) {
+    public LLparser(ArrayList<Token> tokenList) {
         this.tokenList = tokenList;
         declaraedIdentifierList = new ArrayList<>();
         declaraedIdentifierList.add("identifier");
@@ -329,7 +329,7 @@ public class LLParser {
         smallLexer.setPrintTokenList(false);
         smallLexer.lex(args[0]);
         
-        LLParser llParser = new LLParser(smallLexer.getTokenList());
+        LLparser llParser = new LLparser(smallLexer.getTokenList());
         if (llParser.topDownParse() != 0) {
             System.out.println(llParser.parsingErrorMsg);
             System.out.println("Parsing Failed");
