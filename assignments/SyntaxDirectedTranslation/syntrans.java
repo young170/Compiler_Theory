@@ -98,11 +98,15 @@ public class syntrans {
     }
 
     private void printValue(int val) {
-        System.out.print(val);
+        printer(Integer.toString(val));
     }
 
     private void printStringLiteral(String tokenName) {
-        System.out.print(tokenName.substring(1, tokenName.length() - 1));
+        printer(tokenName.substring(1, tokenName.length() - 1));
+    }
+
+    private void printer(String str) {
+        System.out.println(str);
     }
 
     private int isDeclared(String tokenName, ASTNode root) {
