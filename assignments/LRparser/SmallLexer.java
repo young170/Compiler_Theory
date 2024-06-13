@@ -27,6 +27,7 @@ public class SmallLexer {
         symbolTable.put("integer", keywordAttribute);
         symbolTable.put("display", keywordAttribute);
         symbolTable.put("print_line", keywordAttribute);
+        symbolTable.put("$", keywordAttribute);
     }
 
     private void printTokenPair(Token token) {
@@ -68,6 +69,9 @@ public class SmallLexer {
                 printTokenPair(token);
             }
         }
+
+        // EOF
+        tokenList.add(new Token("$", keywordAttribute));
     }
 
     public void scanBuffer(char[] buf, int length) {
