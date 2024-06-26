@@ -131,7 +131,7 @@ void set_value(char *var, int value);
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 
 /* Enabling verbose error messages.  */
@@ -463,9 +463,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    48,    49,    53,    54,    55,    56,    57,
-      58,    62,    63,    64,    68,    78,    79,    80,    84,    85,
-      86,    90,    91,    92,    96
+       0,    42,    42,    46,    47,    51,    52,    53,    54,    55,
+      56,    60,    61,    62,    66,    76,    77,    78,    82,    83,
+      84,    88,    89,    90,    94
 };
 #endif
 
@@ -1401,57 +1401,57 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "calcParser.y"
-    { printf("Program %s executed\n", (yyvsp[(2) - (5)].sval)); ;}
+#line 42 "calcParser.y"
+    { ;}
     break;
 
   case 5:
-#line 53 "calcParser.y"
+#line 51 "calcParser.y"
     { ;}
     break;
 
   case 6:
-#line 54 "calcParser.y"
+#line 52 "calcParser.y"
     { ;}
     break;
 
   case 7:
-#line 55 "calcParser.y"
+#line 53 "calcParser.y"
     { printf("%d\n", (yyvsp[(3) - (5)].ival)); ;}
     break;
 
   case 8:
-#line 56 "calcParser.y"
+#line 54 "calcParser.y"
     { printf("%s\n", (yyvsp[(3) - (5)].sval)); ;}
     break;
 
   case 9:
-#line 57 "calcParser.y"
+#line 55 "calcParser.y"
     { ;}
     break;
 
   case 10:
-#line 58 "calcParser.y"
+#line 56 "calcParser.y"
     { ;}
     break;
 
   case 11:
-#line 62 "calcParser.y"
+#line 60 "calcParser.y"
     { insert((yyvsp[(1) - (3)].sval), (yyvsp[(3) - (3)].ival)); ;}
     break;
 
   case 12:
-#line 63 "calcParser.y"
+#line 61 "calcParser.y"
     { insert((yyvsp[(1) - (5)].sval), (yyvsp[(3) - (5)].ival)); ;}
     break;
 
   case 13:
-#line 64 "calcParser.y"
+#line 62 "calcParser.y"
     { insert((yyvsp[(1) - (1)].sval), 0); ;}
     break;
 
   case 14:
-#line 68 "calcParser.y"
+#line 66 "calcParser.y"
     {
         if (get_value((yyvsp[(1) - (3)].sval)) != -999) {
             set_value((yyvsp[(1) - (3)].sval), (yyvsp[(3) - (3)].ival));
@@ -1462,52 +1462,52 @@ yyreduce:
     break;
 
   case 15:
-#line 78 "calcParser.y"
+#line 76 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (3)].ival) + (yyvsp[(3) - (3)].ival); ;}
     break;
 
   case 16:
-#line 79 "calcParser.y"
+#line 77 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (3)].ival) - (yyvsp[(3) - (3)].ival); ;}
     break;
 
   case 17:
-#line 80 "calcParser.y"
+#line 78 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
     break;
 
   case 18:
-#line 84 "calcParser.y"
+#line 82 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (3)].ival) * (yyvsp[(3) - (3)].ival); ;}
     break;
 
   case 19:
-#line 85 "calcParser.y"
+#line 83 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (3)].ival) / (yyvsp[(3) - (3)].ival); ;}
     break;
 
   case 20:
-#line 86 "calcParser.y"
+#line 84 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
     break;
 
   case 21:
-#line 90 "calcParser.y"
+#line 88 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
     break;
 
   case 22:
-#line 91 "calcParser.y"
+#line 89 "calcParser.y"
     { (yyval.ival) = get_value((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 23:
-#line 92 "calcParser.y"
+#line 90 "calcParser.y"
     { (yyval.ival) = (yyvsp[(2) - (3)].ival); ;}
     break;
 
   case 24:
-#line 96 "calcParser.y"
+#line 94 "calcParser.y"
     { (yyval.ival) = (yyvsp[(1) - (3)].ival) > (yyvsp[(3) - (3)].ival); ;}
     break;
 
@@ -1727,7 +1727,7 @@ yyreturn:
 }
 
 
-#line 99 "calcParser.y"
+#line 97 "calcParser.y"
 
 
 void yyerror(const char *s) {
@@ -1735,7 +1735,6 @@ void yyerror(const char *s) {
 }
 
 int main(void) {
-    yydebug = 1;
     return yyparse();
 }
 

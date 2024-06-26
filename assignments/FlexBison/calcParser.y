@@ -36,12 +36,10 @@ void set_value(char *var, int value);
 %type <ival> expression term factor condition
 %type <sval> var_declaration assignment statement
 
-%debug
-
 %%
 
 program:
-    PROGRAM IDENTIFIER BEGIN_BLOCK statements END_BLOCK { printf("Program %s executed\n", $2); }
+    PROGRAM IDENTIFIER BEGIN_BLOCK statements END_BLOCK { }
     ;
 
 statements:
@@ -103,7 +101,6 @@ void yyerror(const char *s) {
 }
 
 int main(void) {
-    yydebug = 1;
     return yyparse();
 }
 
